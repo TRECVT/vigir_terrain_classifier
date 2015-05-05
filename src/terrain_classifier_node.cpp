@@ -143,7 +143,8 @@ void TerrainClassifierNode::insertPointCloud(const sensor_msgs::PointCloud2& poi
 
   terrain_classifier->insertPointCloud(point_cloud);
 
-  if (terrain_classifier->getInputCloud()->size() <= min_aggregation_size)
+  if ((terrain_classifier->getInputCloud()->size() <= min_aggregation_size) &&
+      (compute_update_skips_counter++ < compute_update_skips))
   {
     if (cloud_input_pub.getNumSubscribers() > 0)
     {
@@ -157,18 +158,12 @@ void TerrainClassifierNode::insertPointCloud(const sensor_msgs::PointCloud2& poi
     return;
   }
 
-  if (compute_update_skips_counter++ >= compute_update_skips)
-  {
-    terrain_classifier->computeNormals(point_cloud);
-    compute_update_skips_counter = 0;
-  }
+  compute_update_skips_counter = 0;
 
-  terrain_classifier->generateHeightGridmap(point_cloud);
+  // perform update
+  generateTerrainModel();
 
   publishDebugData();
-
-  //ROS_INFO("Saved");
-  //pcl::io::savePCDFile("/home/alex/vigir/catkin_ws/vigir_footstep_planning/vigir_terrain_classifier/pointclouds/new.pcd", cloud_input);
 }
 
 bool TerrainClassifierNode::generateTerrainModel()
