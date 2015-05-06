@@ -317,6 +317,8 @@ int main(int argc, char** argv)
       terrain_classifier_node.loadTestPointCloud();
   }
 
+  ros::service::waitForService("generate_feet_pose");
+
   ros::spin();
 
   return 0;

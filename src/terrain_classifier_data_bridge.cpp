@@ -88,12 +88,12 @@ TerrainClassifierDataBridge::TerrainClassifierDataBridge(ros::NodeHandle& nh)
   double t_pitch = 0.0;
   double t_yaw = 0.0;
 
-  if (nh.getParam("/vigir/footstep_planning/foot/left/foot_frame/x", t_x) &&
-      nh.getParam("/vigir/footstep_planning/foot/left/foot_frame/y", t_y) &&
-      nh.getParam("/vigir/footstep_planning/foot/left/foot_frame/z", t_z) &&
-      nh.getParam("/vigir/footstep_planning/foot/left/foot_frame/roll", t_roll) &&
-      nh.getParam("/vigir/footstep_planning/foot/left/foot_frame/pitch", t_pitch) &&
-      nh.getParam("/vigir/footstep_planning/foot/left/foot_frame/yaw", t_yaw))
+  if (nh.getParam("foot/left/foot_frame/x", t_x) &&
+      nh.getParam("foot/left/foot_frame/y", t_y) &&
+      nh.getParam("foot/left/foot_frame/z", t_z) &&
+      nh.getParam("foot/left/foot_frame/roll", t_roll) &&
+      nh.getParam("foot/left/foot_frame/pitch", t_pitch) &&
+      nh.getParam("foot/left/foot_frame/yaw", t_yaw))
   {
     _left_to_base.setOrigin(tf::Point(t_x, t_y, t_z));
 
@@ -107,12 +107,12 @@ TerrainClassifierDataBridge::TerrainClassifierDataBridge(ros::NodeHandle& nh)
     ROS_WARN("No transform from left foot to foot sole avaialble");
   }
 
-  if (nh.getParam("/vigir/footstep_planning/foot/right/foot_frame/x", t_x) &&
-      nh.getParam("/vigir/footstep_planning/foot/right/foot_frame/y", t_y) &&
-      nh.getParam("/vigir/footstep_planning/foot/right/foot_frame/z", t_z) &&
-      nh.getParam("/vigir/footstep_planning/foot/right/foot_frame/roll", t_roll) &&
-      nh.getParam("/vigir/footstep_planning/foot/right/foot_frame/pitch", t_pitch) &&
-      nh.getParam("/vigir/footstep_planning/foot/right/foot_frame/yaw", t_yaw))
+  if (nh.getParam("foot/right/foot_frame/x", t_x) &&
+      nh.getParam("foot/right/foot_frame/y", t_y) &&
+      nh.getParam("foot/right/foot_frame/z", t_z) &&
+      nh.getParam("foot/right/foot_frame/roll", t_roll) &&
+      nh.getParam("foot/right/foot_frame/pitch", t_pitch) &&
+      nh.getParam("foot/right/foot_frame/yaw", t_yaw))
   {
     _left_to_base.setOrigin(tf::Point(t_x, t_y, t_z));
 
@@ -129,10 +129,10 @@ TerrainClassifierDataBridge::TerrainClassifierDataBridge(ros::NodeHandle& nh)
   // compute number of scans to pull on each update
   _scan_cnt = static_cast<size_t>(floor(scan_hz * _cb_seconds));
 
-  _feet_client = nh.serviceClient<vigir_footstep_planning_msgs::GenerateFeetPoseService>("vigir/footstep_planning/generate_feet_pose");
+  _feet_client = nh.serviceClient<vigir_footstep_planning_msgs::GenerateFeetPoseService>("generate_feet_pose");
   _point_cloud_roi_client = nh.serviceClient<flor_perception_msgs::PointCloudRegionRequest>("/flor/worldmodel/pointcloud_roi");
-  _point_cloud_pub = nh.advertise<sensor_msgs::PointCloud2>("vigir/terrain_classifier/set_point_cloud", 10, true);
-  _update_cloud_pub = nh.advertise<sensor_msgs::PointCloud2>("vigir/terrain_classifier/point_cloud_update", 10);
+  _point_cloud_pub = nh.advertise<sensor_msgs::PointCloud2>("set_point_cloud", 10, true);
+  _update_cloud_pub = nh.advertise<sensor_msgs::PointCloud2>("point_cloud_update", 10);
 
   _reset_sub = nh.subscribe("reset_terrain", 1, &TerrainClassifierDataBridge::set_reset, this);
   _activate_hack_sub = nh.subscribe("plane_hack_once", 1, &TerrainClassifierDataBridge::set_terrain_hack, this);
@@ -280,7 +280,7 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
 
   ros::service::waitForService("/flor/worldmodel/pointcloud_roi");
-  ros::service::waitForService("/vigir/footstep_planning/generate_feet_pose");
+  ros::service::waitForService("generate_feet_pose");
 
   // note goal manager can only handle a single thread
   TerrainClassifierDataBridge bridge(nh);
