@@ -7,7 +7,7 @@ TerrainClassifier::TerrainClassifier(ros::NodeHandle& nh, const TerrainClassifie
   setParams(params);
 
   // start service clients
-  generate_feet_pose_client = nh.serviceClient<vigir_footstep_planning_msgs::GenerateFeetPoseService>("/vigir/footstep_planning/generate_feet_pose");
+  generate_feet_pose_client = nh.serviceClient<vigir_footstep_planning_msgs::GenerateFeetPoseService>("generate_feet_pose");
 }
 
 TerrainClassifier::TerrainClassifier(ros::NodeHandle& nh)
@@ -15,7 +15,7 @@ TerrainClassifier::TerrainClassifier(ros::NodeHandle& nh)
   setParams(TerrainClassifierParams(nh));
 
   // start service clients
-  generate_feet_pose_client = nh.serviceClient<vigir_footstep_planning_msgs::GenerateFeetPoseService>("/vigir/footstep_planning/generate_feet_pose");
+  generate_feet_pose_client = nh.serviceClient<vigir_footstep_planning_msgs::GenerateFeetPoseService>("generate_feet_pose");
 
   setDataOutdated();
 }

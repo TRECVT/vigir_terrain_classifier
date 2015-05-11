@@ -7,7 +7,7 @@ project(vigir_terrain_classifier)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp rospy message_generation std_msgs geometry_msgs sensor_msgs nav_msgs visualization_msgs vigir_footstep_planning_msgs vigir_footstep_planning_lib  pcl_conversions)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy message_generation std_msgs geometry_msgs sensor_msgs nav_msgs visualization_msgs vigir_footstep_planning_msgs vigir_footstep_planning_lib  pcl_conversions pcl_ros tf)
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
@@ -138,6 +138,7 @@ add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 add_executable(point_cloud_portioner_node src/point_cloud_portioner_node.cpp)
 add_executable(terrain_classifier_node src/terrain_classifier_node.cpp)
 add_executable(terrain_classifier_test src/terrain_classifier_test.cpp)
+add_executable(terrain_data_bridge src/terrain_classifier_data_bridge.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -148,6 +149,10 @@ target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${boost_LIBRARIES} ${P
 target_link_libraries(point_cloud_portioner_node ${PROJECT_NAME})
 target_link_libraries(terrain_classifier_node ${PROJECT_NAME})
 target_link_libraries(terrain_classifier_test ${PROJECT_NAME})
+target_link_libraries(terrain_data_bridge
+  ${PCL_LIBRARIES}
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
@@ -164,7 +169,7 @@ target_link_libraries(terrain_classifier_test ${PROJECT_NAME})
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ${PROJECT_NAME} terrain_classifier_node terrain_classifier_test
+install(TARGETS ${PROJECT_NAME} terrain_classifier_node terrain_classifier_test terrain_data_bridge
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

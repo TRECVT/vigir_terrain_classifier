@@ -1,5 +1,10 @@
 #include <vigir_terrain_classifier/grid_map/height_grid_map.h>
 
+namespace
+{
+  const double MINIMUM_SCALE = 0.0001;
+}
+
 namespace vigir_terrain_classifier
 {
 HeightGridMap::HeightGridMap(const std::string& frame_id, double resolution, double min_expansion_size, double update_weight)
@@ -69,7 +74,22 @@ void HeightGridMap::resize(const geometry_msgs::Vector3& min, const geometry_msg
 double HeightGridMap::rescale(nav_msgs::OccupancyGrid& map, double old_min_z, double old_max_z, double new_min_z, double new_max_z)
 {
   double old_height_scale = (old_max_z-old_min_z) / (GRID_MAP_VALUE_RANGE);
-  double new_inv_height_scale = (GRID_MAP_VALUE_RANGE) / (new_max_z-new_min_z);
+
+  if (old_height_scale < MINIMUM_SCALE)
+  {
+    old_height_scale = MINIMUM_SCALE;
+  }
+
+  double new_inv_height_scale = std::numeric_limits<double>::max();
+  if (new_max_z > new_min_z)
+  {
+    new_inv_height_scale = (std::numeric_limits<int8_t>::max()-std::numeric_limits<int8_t>::min()+1) / (new_max_z-new_min_z);
+  }
+
+  if (new_inv_height_scale > 1.0 / MINIMUM_SCALE)
+  {
+    new_inv_height_scale = 1.0 / MINIMUM_SCALE;
+  }
 
   for (nav_msgs::OccupancyGrid::_data_type::iterator itr = map.data.begin(); itr != map.data.end(); itr++)
   {
@@ -88,9 +108,18 @@ void HeightGridMap::rescale(double min_z, double max_z)
     return;
 
   if (height_scale != 0.0)
+  {
     height_scale = rescale(*grid_map, this->min.z, this->max.z, min_z, max_z);
+  }
   else
+  {
     height_scale = (max_z-min_z) / static_cast<double>(GRID_MAP_VALUE_RANGE);
+
+    if (height_scale < MINIMUM_SCALE)
+    {
+      height_scale = MINIMUM_SCALE;
+    }
+  }
 
   inv_height_scale = 1.0/height_scale;
   this->min.z = min_z;
@@ -100,7 +129,18 @@ void HeightGridMap::rescale(double min_z, double max_z)
 int8_t HeightGridMap::heightToMap(double height, double min_z, double max_z, int8_t min_val, int8_t max_val)
 {
   assert(height >= min_z && height <= max_z);
-  double inv_height_scale = static_cast<double>(max_val-min_val)/(max_z-min_z);
+
+  double inv_height_scale = std::numeric_limits<double>::max();
+  if (max_z > min_z)
+  {
+    inv_height_scale = static_cast<double>(max_val-min_val)/(max_z-min_z);
+  }
+
+  if (inv_height_scale > 1.0 / MINIMUM_SCALE)
+  {
+    inv_height_scale = 1.0 / MINIMUM_SCALE;
+  }
+
   return heightToMap(height, min_z, inv_height_scale, min_val);
 }
 
@@ -113,6 +153,12 @@ int8_t HeightGridMap::heightToMap(double height, double min_z, double inv_height
 double HeightGridMap::heightToWorld(int8_t height, double min_z, double max_z, int8_t min_val, int8_t max_val)
 {
   double height_scale = (max_z-min_z)/static_cast<double>(max_val-min_val);
+
+  if (height_scale < MINIMUM_SCALE)
+  {
+    height_scale = MINIMUM_SCALE;
+  }
+
   return heightToWorld(height, min_z, height_scale, min_val);
 }
 
