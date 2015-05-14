@@ -41,8 +41,8 @@
 
 #include <vigir_terrain_classifier/pcl/octree_voxel_grid.h>
 
-#define GRID_MAP_EMPTY_VAL std::numeric_limits<int8_t>::min()
-#define GRID_MAP_MIN_VAL (std::numeric_limits<int8_t>::min()+1)
+#define GRID_MAP_EMPTY_VAL 
+#define GRID_MAP_MIN_VAL 
 #define GRID_MAP_VALUE_RANGE (std::numeric_limits<int8_t>::max()-std::numeric_limits<int8_t>::min())
 
 
@@ -96,8 +96,12 @@ public:
   typedef boost::shared_ptr<GridMap> Ptr;
   typedef boost::shared_ptr<const GridMap> ConstPtr;
 
+  static const int8_t EMPTY_VAL;
+  static const int8_t MIN_VAL;
+  static const int32_t VALUE_RANGE;
+
 protected:
-  void getPointCloudBoundary(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& cloud, geometry_msgs::Vector3& min, geometry_msgs::Vector3& max) const;
+  size_t getPointCloudBoundary(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& cloud, geometry_msgs::Vector3& min, geometry_msgs::Vector3& max) const;
 
   nav_msgs::OccupancyGrid::Ptr grid_map;
 
