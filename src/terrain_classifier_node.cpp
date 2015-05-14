@@ -177,10 +177,10 @@ void TerrainClassifierNode::insertPointCloud(const sensor_msgs::PointCloud2& poi
   compute_update_skips_counter = 0;
 
   // perform update
-  generateTerrainModel();
+  // generateTerrainModel();
 
-  // terrain_classifier.computeNormals(point_cloud);
-  // terrain_classifier.generateHeightGridmap(point_cloud);
+  terrain_classifier.computeNormals(point_cloud);
+  terrain_classifier.generateHeightGridmap(point_cloud);
 
   publishDebugData();
 }
