@@ -192,7 +192,7 @@ nav_msgs::OccupancyGrid::Ptr TerrainClassifier::getHeightGridMapRescaled(int8_t 
   for (nav_msgs::OccupancyGrid::_data_type::iterator itr = map->data.begin(); itr != map->data.end(); itr++)
   {
     int8_t& val = *itr;
-    if (val == GRID_MAP_EMPTY_VAL)
+    if (val == GridMap::EMPTY_VAL)
     {
       val = min_val;
       continue;

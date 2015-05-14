@@ -2,6 +2,11 @@
 
 namespace vigir_terrain_classifier
 {
+
+const int8_t GridMap::EMPTY_VAL = std::numeric_limits<int8_t>::min();
+const int8_t GridMap::MIN_VAL = std::numeric_limits<int8_t>::min() + 1;
+const int32_t GridMap::VALUE_RANGE = std::numeric_limits<int8_t>::max() - GridMap::MIN_VAL;
+
 GridMap::GridMap(const std::string& frame_id, double resolution, double min_expansion_size)
   : min_expansion_size(min_expansion_size)
 {
@@ -159,7 +164,7 @@ void GridMap::resize(const geometry_msgs::Vector3& min, const geometry_msgs::Vec
   new_grid_map->info.origin.position.z = grid_map->info.origin.position.z;
 
   // reorganize data
-  new_grid_map->data.resize(new_grid_map->info.width * new_grid_map->info.height, GRID_MAP_EMPTY_VAL);
+  new_grid_map->data.resize(new_grid_map->info.width * new_grid_map->info.height, GridMap::EMPTY_VAL);
 
   int old_idx = 0;
   int new_idx = 0;

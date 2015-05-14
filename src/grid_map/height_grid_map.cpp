@@ -73,7 +73,7 @@ void HeightGridMap::resize(const geometry_msgs::Vector3& min, const geometry_msg
 
 double HeightGridMap::rescale(nav_msgs::OccupancyGrid& map, double old_min_z, double old_max_z, double new_min_z, double new_max_z)
 {
-  double old_height_scale = (old_max_z-old_min_z) / (GRID_MAP_VALUE_RANGE);
+  double old_height_scale = (old_max_z-old_min_z) / static_cast<double>(GridMap::VALUE_RANGE);
 
   if (old_height_scale < MINIMUM_SCALE)
   {
@@ -113,7 +113,7 @@ void HeightGridMap::rescale(double min_z, double max_z)
   }
   else
   {
-    height_scale = (max_z-min_z) / static_cast<double>(GRID_MAP_VALUE_RANGE);
+    height_scale = (max_z-min_z) / static_cast<double>(GridMap::VALUE_RANGE);
 
     if (height_scale < MINIMUM_SCALE)
     {
@@ -189,7 +189,7 @@ void HeightGridMap::updateHeight(double x, double y, double height)
     int8_t new_h = heightToMap(height, min.z, inv_height_scale);
 
     int8_t& h = grid_map->data.at(idx);
-    if (h == GRID_MAP_EMPTY_VAL)
+    if (h == GridMap::EMPTY_VAL)
       h = new_h;
     else
       h += update_weight*static_cast<double>(new_h-h);
@@ -204,7 +204,7 @@ void HeightGridMap::updateHeight(int map_x, int map_y, double height)
     int8_t new_h = heightToMap(height, min.z, inv_height_scale);
 
     int8_t& h = grid_map->data.at(idx);
-    if (h == GRID_MAP_EMPTY_VAL)
+    if (h == GridMap::EMPTY_VAL)
       h = new_h;
     else
       h += update_weight*static_cast<double>(new_h-h);
@@ -217,7 +217,7 @@ bool HeightGridMap::getHeight(double x, double y, double& height) const
   if (getGridMapIndex(x, y, idx))
   {
     const int8_t& h = grid_map->data.at(idx);
-    if (h != GRID_MAP_EMPTY_VAL)
+    if (h != GridMap::EMPTY_VAL)
     {
       height = heightToWorld(h, min.z, height_scale);
       return true;
@@ -233,7 +233,7 @@ bool HeightGridMap::getHeight(int map_x, int map_y, double& height) const
   if (getGridMapIndex(map_x, map_y, idx))
   {
     const int8_t& h = grid_map->data.at(idx);
-    if (h != GRID_MAP_EMPTY_VAL)
+    if (h != GridMap::EMPTY_VAL)
     {
       height = heightToWorld(h, min.z, height_scale);
       return true;
