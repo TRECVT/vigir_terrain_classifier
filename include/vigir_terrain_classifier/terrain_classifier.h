@@ -122,11 +122,23 @@ struct TerrainClassifierParams
 
     nh.param("normal_estimator/radius", ne_radius, 0.05);
 
+    nh.param("gradient_estimator/gradient_obstacle", ge_obstacle, false);
     nh.param("gradient_estimator/thresh", ge_thresh, 0.5);
 
     nh.param("edge_detector/radius", ed_radius, 0.05);
     nh.param("edge_detector/max_std", ed_max_std, 0.02);
     nh.param("edge_detector/non_max_supp_radius", ed_non_max_supp_radius, 0.05);
+    
+    int minimum_neighbor_cnt = 0;
+    nh.param("edge_detector/minimum_neighbors", minimum_neighbor_cnt, 0);
+    if (minimum_neighbor_cnt >= 0)
+    {
+      ed_min_neighbor_cnt = static_cast<size_t>(minimum_neighbor_cnt);
+    }
+    else
+    {
+      ed_min_neighbor_cnt = 0;
+    }
 
     nh.param("grid_map_generator/resolution", gg_res, 0.02);
     nh.param("grid_map_generator/reconstruct", gg_reconstruct, false);
@@ -181,12 +193,14 @@ struct TerrainClassifierParams
   double ne_radius;
 
   // params for gradients estimator
+  bool ge_obstacle;
   double ge_thresh;
 
   // params for edge detector
   double ed_radius;
   double ed_max_std;
   double ed_non_max_supp_radius;
+  size_t ed_min_neighbor_cnt;
 
   // params for grid map generator
   double gg_res;

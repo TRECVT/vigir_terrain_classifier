@@ -200,7 +200,8 @@ bool TerrainClassifierDataBridge::getPointCloud()
   cloud_srv.request.region_req.bounding_box_max.y = get_feet_msg.response.feet.left.pose.position.y + _request_dimension;
   cloud_srv.request.region_req.bounding_box_max.z = get_feet_msg.response.feet.left.pose.position.z + _request_dimension;
 
-  cloud_srv.request.region_req.resolution = 0.0; // default request
+  cloud_srv.request.region_req.resolution = -1.0; // not the default, and according to logic in 
+  // point cloud aggregator, this should skip the filtering all together
   cloud_srv.request.region_req.request_augment = static_cast<uint8_t>(0); // no map augments??
 
   if (!_point_cloud_roi_client.call(cloud_srv))

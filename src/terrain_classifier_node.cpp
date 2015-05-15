@@ -161,12 +161,12 @@ void TerrainClassifierNode::insertPointCloud(const sensor_msgs::PointCloud2& poi
   compute_update_skips_counter = 0;
 
   // perform update
-  // generateTerrainModel();
+  generateTerrainModel();
 
-  terrain_classifier->computeNormals(point_cloud);
-  terrain_classifier->generateHeightGridmap(point_cloud);
+  // terrain_classifier->computeNormals(point_cloud);
+  // terrain_classifier->generateHeightGridmap(point_cloud);
 
-  publishDebugData();
+  publishTerrainModel();
 }
 
 bool TerrainClassifierNode::generateTerrainModel()
@@ -222,6 +222,12 @@ void TerrainClassifierNode::publishTerrainModel() const
     mesh_msg.header.stamp = ros::Time::now();
     mesh_msg.header.frame_id = terrain_classifier->getFrameId();
     mesh_surface_pub.publish(mesh_msg);
+  }
+
+  // publish height grid map
+  if (height_grid_map_pub.getNumSubscribers() > 0)
+  {
+    height_grid_map_pub.publish(terrain_classifier->getHeightGridMapRescaled());
   }
 }
 

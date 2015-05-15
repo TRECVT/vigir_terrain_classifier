@@ -252,8 +252,8 @@ bool TerrainClassifier::computeNormals(const pcl::PointCloud<pcl::PointXYZ>::Con
   ne.setInputCloud(search_points);
   ne.setSearchSurface(cloud_processed);
   ne.setSearchMethod(tree);
-  ne.setRadiusSearch(params.ne_radius);
-  //ne.setKSearch(20);
+  //ne.setRadiusSearch(params.ne_radius);
+  ne.setKSearch(20);
   ne.compute(cloud_normals);
 
   // concat resulting normals with their positions
@@ -392,7 +392,7 @@ bool TerrainClassifier::detectEdges()
       // determine squared mean error
       double sq_sum_e = 0.0;
 
-      for (size_t j = 0; j < pointIdxRadiusSearch.size (); j++)
+      for (size_t j = 0; j < pointIdxRadiusSearch.size(); j++)
       {
         if (pointIdxRadiusSearch[j] == (int)i)
           continue;
@@ -415,16 +415,22 @@ bool TerrainClassifier::detectEdges()
         double dot_scale = std::abs(current.normal_x * std::abs(neigh.x-current.x) + current.normal_y * std::abs(neigh.y-current.y)) / neigh_norm;
 
         // compute support in distance
-        double dist_scale = (params.ed_radius-sqrt(pointRadiusSquaredDistance[j]))/params.ed_radius;
+        double dist_scale = (params.ed_radius - sqrt(pointRadiusSquaredDistance[j])) / params.ed_radius;
 
         sq_sum_e += (sq_err_nx + sq_err_ny + sq_err_z) * dot_scale * dist_scale;
       }
 
-      double sq_mean_e = sq_sum_e/pointIdxRadiusSearch.size();
+      if (pointIdxRadiusSearch.size() > 0)
+      {
+        double sq_mean_e = sq_sum_e / static_cast<double>(pointIdxRadiusSearch.size());
 
-      // check for edge
-      if (sq_mean_e > params.ed_max_std*params.ed_max_std)
-        result.intensity = sq_mean_e;
+        // check for edge
+        if (sq_mean_e > params.ed_max_std*params.ed_max_std)
+        {
+          result.intensity = sq_mean_e;
+        }
+      }
+      
     }
   }
 
@@ -448,9 +454,9 @@ bool TerrainClassifier::detectEdges()
       bool local_max = true;
 
       // determine local max
-      for (size_t j = 0; j < pointIdxRadiusSearch.size (); j++)
+      for (size_t j = 0; j < pointIdxRadiusSearch.size(); j++)
       {
-        if (pointIdxRadiusSearch[j] == (int)i)
+        if (pointIdxRadiusSearch[j] == static_cast<int>(i))
           continue;
 
         const pcl::PointXYZI& neigh = tmp_edges->at(pointIdxRadiusSearch[j]);
@@ -469,8 +475,11 @@ bool TerrainClassifier::detectEdges()
       }
 
       // check for edge
-      if (local_max)
+      // make issolated points not an edge
+      if (local_max && (pointIdxRadiusSearch.size() >= params.ed_min_neighbor_cnt))
+      {
         result.intensity = 0.0;
+      }
     }
   }
 
@@ -539,7 +548,7 @@ bool TerrainClassifier::generateGroundLevelGridmap()
 //  }
 
   // add data from gradients point cloud
-  if (cloud_gradients)
+  if (cloud_gradients && params.ge_obstacle)
   {
     ROS_INFO("...adding gradients");
     for (size_t i = 0; i < cloud_gradients->size(); i++)
